@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - STEL Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6600;
+            --primary-dark: #e55500;
+            --secondary: #333;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Filtros */
+        .filters {
+            background: var(--white);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-item label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .filter-item input,
+        .filter-item select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .filter-item input:focus,
+        .filter-item select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow);
+        }
+
+        /* Grid de Productos */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .product-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .product-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-brand {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .product-body {
+            padding: 1.5rem;
+        }
+
+        .product-specs {
+            margin-bottom: 1rem;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Modal de Detalle */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--white);
+            max-width: 1000px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            background: var(--primary);
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            background: var(--primary-dark);
+            transform: rotate(90deg);
+        }
+
+        #product-detail {
+            padding: 2rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1rem;
+            }
+
+            .modal-content {
+                margin: 0;
+                border-radius: 0;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">🏭 STEL Shop - Catálogo Premium</div>
+                <div>
+                    <button class="btn" onclick="loadProducts()">🔄 Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="container">
+        <!-- Filtros -->
+        <section class="filters">
+            <h2 style="margin-bottom: 1.5rem; color: var(--primary);">🔍 Filtros de Búsqueda</h2>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="search">Buscar</label>
+                    <input type="text" id="search" placeholder="Nombre, marca o modelo...">
+                </div>
+                <div class="filter-item">
+                    <label for="familia">Familia</label>
+                    <select id="familia">
+                        <option value="">Todas las familias</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="marca">Marca</label>
+                    <select id="marca">
+                        <option value="">Todas las marcas</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="precio">Precio máximo</label>
+                    <input type="number" id="precio" placeholder="USD">
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn" onclick="applyFilters()">Aplicar Filtros</button>
+                <button class="btn" style="background: #666;" onclick="clearFilters()">Limpiar</button>
+            </div>
+        </section>
+
+        <!-- Grid de Productos -->
+        <section id="products-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem;">Cargando productos...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Detalle -->
+    <div id="modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="product-detail"></div>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la aplicación
+        let products = [];
+        let filteredProducts = [];
+        let currentProduct = null;
+
+        // Simular carga de productos (reemplazar con llamada real a la API)
+        function loadProducts() {
+            // Simulación de productos
+            products = [
+                {
+                    sku: 'GE-001',
+                    nombre: 'Grupo Electrógeno Cummins 100KVA',
+                    marca: 'Cummins',
+                    modelo: 'C100D5',
+                    familia: 'Grupos Electrógenos',
+                    precio: 15500,
+                    potencia: '100 KVA',
+                    motor: '6BT5.9-G2',
+                    stock: 5,
+                    pdf_url: 'cummins_100kva.pdf'
+                },
+                {
+                    sku: 'GE-002',
+                    nombre: 'Generador Diesel Honda 50KVA',
+                    marca: 'Honda',
+                    modelo: 'HD50',
+                    familia: 'Grupos Electrógenos',
+                    precio: 8900,
+                    potencia: '50 KVA',
+                    motor: 'Honda GX690',
+                    stock: 3,
+                    pdf_url: 'honda_50kva.pdf'
+                },
+                {
+                    sku: 'COMP-001',
+                    nombre: 'Compresor de Aire Industrial 500L',
+                    marca: 'Atlas Copco',
+                    modelo: 'GA11',
+                    familia: 'Compresores',
+                    precio: 12000,
+                    potencia: '11 KW',
+                    presion: '8 Bar',
+                    stock: 2,
+                    pdf_url: 'atlas_ga11.pdf'
+                }
+            ];
+
+            // Actualizar filtros
+            updateFilters();
+            
+            // Mostrar productos
+            filteredProducts = [...products];
+            displayProducts();
+        }
+
+        function updateFilters() {
+            const familias = [...new Set(products.map(p => p.familia))];
+            const marcas = [...new Set(products.map(p => p.marca))];
+
+            const familiaSelect = document.getElementById('familia');
+            familiaSelect.innerHTML = '<option value="">Todas las familias</option>';
+            familias.forEach(f => {
+                familiaSelect.innerHTML += `<option value="${f}">${f}</option>`;
+            });
+
+            const marcaSelect = document.getElementById('marca');
+            marcaSelect.innerHTML = '<option value="">Todas las marcas</option>';
+            marcas.forEach(m => {
+                marcaSelect.innerHTML += `<option value="${m}">${m}</option>`;
+            });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const familia = document.getElementById('familia').value;
+            const marca = document.getElementById('marca').value;
+            const precioMax = parseFloat(document.getElementById('precio').value) || Infinity;
+
+            filteredProducts = products.filter(product => {
+                const matchSearch = !search || 
+                    product.nombre.toLowerCase().includes(search) ||
+                    product.marca.toLowerCase().includes(search) ||
+                    product.modelo.toLowerCase().includes(search);
+                
+                const matchFamilia = !familia || product.familia === familia;
+                const matchMarca = !marca || product.marca === marca;
+                const matchPrecio = product.precio <= precioMax;
+
+                return matchSearch && matchFamilia && matchMarca && matchPrecio;
+            });
+
+            displayProducts();
+        }
+
+        function clearFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('familia').value = '';
+            document.getElementById('marca').value = '';
+            document.getElementById('precio').value = '';
+            
+            filteredProducts = [...products];
+            displayProducts();
+        }
+
+        function displayProducts() {
+            const container = document.getElementById('products-container');
+            
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem;">
+                        <h3>No se encontraron productos</h3>
+                        <p>Intenta ajustar los filtros de búsqueda</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <h2 style="margin-bottom: 2rem;">
+                    📦 ${filteredProducts.length} Productos Encontrados
+                </h2>
+                <div class="products-grid">
+                    ${filteredProducts.map(product => `
+                        <div class="product-card" onclick="showProductDetail('${product.sku}')">
+                            <div class="product-header">
+                                <div class="product-name">${product.nombre}</div>
+                                <div class="product-brand">${product.marca} - ${product.modelo}</div>
+                            </div>
+                            <div class="product-body">
+                                <div class="product-specs">
+                                    ${product.potencia ? `
+                                        <div class="spec-item">
+                                            <span class="spec-label">Potencia:</span>
+                                            <span>${product.potencia}</span>
+                                        </div>
+                                    ` : ''}
+                                    ${product.motor ? `
+                                        <div class="spec-item">
+                                            <span class="spec-label">Motor:</span>
+                                            <span>${product.motor}</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="spec-item">
+                                        <span class="spec-label">Stock:</span>
+                                        <span style="color: ${product.stock > 0 ? 'green' : 'red'}">
+                                            ${product.stock > 0 ? product.stock + ' unidades' : 'Sin stock'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="product-price">
+                                    USD ${product.precio.toLocaleString()}
+                                </div>
+                                <div class="product-actions">
+                                    <button class="btn btn-small">Ver Detalles</button>
+                                    ${product.pdf_url ? 
+                                        `<button class="btn btn-small" style="background: #666;">📄 PDF</button>` 
+                                        : ''
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function showProductDetail(sku) {
+            const product = products.find(p => p.sku === sku);
+            if (!product) return;
+
+            currentProduct = product;
+            
+            // Mostrar loading
+            document.getElementById('product-detail').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generando descripción detallada...</p>
+                </div>
+            `;
+            
+            document.getElementById('modal').style.display = 'block';
+            
+            // Simular generación de descripción (aquí llamarías a tu API)
+            setTimeout(() => {
+                generateDetailedDescription(product);
+            }, 1000);
+        }
+
+        function generateDetailedDescription(product) {
+            // Aquí iría la llamada real a tu API de generación
+            // Por ahora, mostraremos una descripción de ejemplo
+            
+            const detailHTML = `
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <!-- Header del Producto -->
+                    <div style="background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%); color: white; padding: 30px; text-align: center;">
+                        <h1 style="margin: 0; font-size: 2.5em; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+                            ${product.nombre.toUpperCase()}
+                        </h1>
+                        <p style="margin: 10px 0 0 0; font-size: 1.2em; opacity: 0.95;">
+                            ${product.marca} - ${product.modelo}
+                        </p>
+                    </div>
+                    
+                    <!-- Contenido Principal -->
+                    <div style="padding: 30px;">
+                        <!-- Descripción -->
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                            <h2 style="color: #ff6600; margin-bottom: 15px;">
+                                <span style="margin-right: 10px;">🎯</span>Descripción General
+                            </h2>
+                            <p style="line-height: 1.8; color: #555; font-size: 1.1em; margin-bottom: 15px;">
+                                El <strong>${product.nombre}</strong> es un equipo de última generación diseñado para 
+                                satisfacer las necesidades más exigentes del mercado industrial. Con tecnología de punta 
+                                y construcción robusta, garantiza un rendimiento excepcional y máxima confiabilidad.
+                            </p>
+                            <p style="line-height: 1.8; color: #555; font-size: 1.1em;">
+                                Fabricado por <strong>${product.marca}</strong>, líder mundial en su sector, este modelo 
+                                ${product.modelo} combina innovación, eficiencia energética y durabilidad para brindar 
+                                una solución integral a sus requerimientos operativos.
+                            </p>
+                        </div>
+
+                        <!-- Características -->
+                        <div style="background: white; padding: 25px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 20px;">
+                            <h2 style="color: #ff6600; margin-bottom: 20px;">
+                                <span style="margin-right: 10px;">⭐</span>Características Destacadas
+                            </h2>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                                <div style="padding: 15px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff6600;">
+                                    <strong style="color: #ff6600;">✓ Alta Eficiencia</strong>
+                                    <p style="margin: 5px 0 0 0; color: #666;">Máximo rendimiento con mínimo consumo</p>
+                                </div>
+                                <div style="padding: 15px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff6600;">
+                                    <strong style="color: #ff6600;">✓ Construcción Robusta</strong>
+                                    <p style="margin: 5px 0 0 0; color: #666;">Diseñado para trabajo continuo 24/7</p>
+                                </div>
+                                <div style="padding: 15px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff6600;">
+                                    <strong style="color: #ff6600;">✓ Fácil Mantenimiento</strong>
+                                    <p style="margin: 5px 0 0 0; color: #666;">Acceso simple a todos los componentes</p>
+                                </div>
+                                <div style="padding: 15px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff6600;">
+                                    <strong style="color: #ff6600;">✓ Garantía Extendida</strong>
+                                    <p style="margin: 5px 0 0 0; color: #666;">Respaldo total del fabricante</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Especificaciones -->
+                        <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                            <h2 style="color: #ff6600; margin-bottom: 20px;">
+                                <span style="margin-right: 10px;">📊</span>Especificaciones Técnicas
+                            </h2>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                ${Object.entries(product).filter(([key, value]) => 
+                                    !['sku', 'nombre', 'pdf_url'].includes(key) && value
+                                ).map(([key, value]) => `
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: bold; text-transform: capitalize;">
+                                            ${key.replace('_', ' ')}:
+                                        </td>
+                                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+                                            ${value}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </table>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div style="background: #333; color: white; padding: 30px; text-align: center; border-radius: 10px;">
+                            <h2 style="margin-bottom: 20px;">¡Contáctanos Ahora!</h2>
+                            <p style="font-size: 1.1em; margin-bottom: 25px; opacity: 0.9;">
+                                Nuestros expertos están listos para asesorarte
+                            </p>
+                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                <a href="https://wa.me/541139563099" 
+                                   style="background: #25D366; color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">
+                                    📱 WhatsApp
+                                </a>
+                                <a href="mailto:info@stelshop.com" 
+                                   style="background: #ff6600; color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">
+                                    ✉️ Email
+                                </a>
+                                <a href="tel:+541139563099" 
+                                   style="background: #0066cc; color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold;">
+                                    📞 Llamar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('product-detail').innerHTML = detailHTML;
+        }
+
+        function closeModal(event) {
+            if (!event || event.target === document.getElementById('modal')) {
+                document.getElementById('modal').style.display = 'none';
+                currentProduct = null;
+            }
+        }
+
+        // Cargar productos al iniciar
+        window.onload = () => {
+            loadProducts();
+        };
+
+        // Aplicar filtros en tiempo real
+        document.getElementById('search').addEventListener('input', applyFilters);
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "database": {
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": "lista_precios_kor",
+    "table": "shop_master_gaucho_completo"
+  },
+  "ai": {
+    "api_key": "",
+    "provider": "gemini"
+  },
+  "contact": {
+    "whatsapp": "541139563099",
+    "email": "info@stelshop.com",
+    "phone_display": "+54 11 3956-3099",
+    "website": "www.stelshop.com"
+  }
+}
