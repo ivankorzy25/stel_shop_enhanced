@@ -14,6 +14,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from datetime import datetime
 import threading
+from selenium.webdriver.common.keys import Keys
 
 
 class SeleniumHandler:
@@ -482,25 +483,29 @@ class SeleniumHandler:
                 print("   🔄 Navegando al catálogo...")
                 if not self.navigate_to_catalog():
                     self.error_count += 1
+                    self.status["errors"] = self.error_count
                     continue
 
                 # PASO 2: Buscar el producto
-                sku = product.get("sku") or product.get("codigo")
+                sku = product.get("sku") or product.get("SKU") or product.get("codigo")
                 print(f"   🔍 Buscando producto: {sku}")
                 if not self.search_product(sku):
                     self.error_count += 1
+                    self.status["errors"] = self.error_count
                     continue
 
                 # PASO 3: Ir a pestaña Shop
                 print("   📑 Abriendo pestaña Shop...")
                 if not self.navigate_to_shop_tab():
                     self.error_count += 1
+                    self.status["errors"] = self.error_count
                     continue
 
                 # PASO 4: Hacer clic en Editar Shop
                 print("   ✏️ Abriendo editor...")
                 if not self.click_edit_shop():
                     self.error_count += 1
+                    self.status["errors"] = self.error_count
                     continue
 
                 # PASO 5: Generar descripción con IA
@@ -510,6 +515,7 @@ class SeleniumHandler:
                 if not description_data:
                     print("   ❌ No se pudo generar descripción")
                     self.error_count += 1
+                    self.status["errors"] = self.error_count
                     continue
 
                 # PASO 6: Actualizar los campos
@@ -539,11 +545,6 @@ class SeleniumHandler:
                     self.error_count += 1
                     self.status["errors"] = self.error_count
 
-                # Volver al catálogo para el siguiente producto
-                print("   🔄 Volviendo al catálogo...")
-                self.driver.get("about:blank")
-                time.sleep(1)
-
                 # Delay entre productos
                 time.sleep(self.config["delay_between_products"])
 
@@ -555,6 +556,7 @@ class SeleniumHandler:
         # Finalizar
         self.is_processing = False
         self.status["processing"] = False
+        self.status["progress"] = 100
         self.current_product = None
 
         print(f"\n✅ Procesamiento completado:")
@@ -565,3 +567,67 @@ class SeleniumHandler:
     def log(self, message):
         """Método auxiliar para logging"""
         print(message)
+
+    def get_status(self):
+        """Obtiene el estado actual del handler"""
+        return self.status
+
+    def process_products(self, products, generate_description_callback):
+        """Procesa una lista de productos"""
+        if self.is_processing:
+            print("⚠️ Ya hay un procesamiento en curso")
+            return False
+
+        self.total_products = len(products)
+        self.processed_count = 0
+        self.error_count = 0
+        self.is_processing = True
+        self.stop_processing = False
+        self.pause_processing = False
+
+        # Actualizar estado
+        self.status["processing"] = True
+        self.status["total"] = self.total_products
+        self.status["processed"] = 0
+        self.status["errors"] = 0
+
+        # Iniciar thread de procesamiento
+        self.processing_thread = threading.Thread(
+            target=self._process_products_thread,
+            args=(products, generate_description_callback),
+        )
+        self.processing_thread.daemon = True
+        self.processing_thread.start()
+
+        return True
+
+    def pause(self):
+        """Pausa el procesamiento"""
+        self.pause_processing = True
+        self.status["paused"] = True
+        print("⏸️ Procesamiento pausado")
+
+    def resume(self):
+        """Reanuda el procesamiento"""
+        self.pause_processing = False
+        self.status["paused"] = False
+        print("▶️ Procesamiento reanudado")
+
+    def stop(self):
+        """Detiene el procesamiento"""
+        self.stop_processing = True
+        self.is_processing = False
+        self.status["processing"] = False
+        print("🛑 Procesamiento detenido")
+
+    def close_browser(self):
+        """Cierra el navegador"""
+        try:
+            if self.driver:
+                self.driver.quit()
+                self.driver = None
+                self.status["browser_active"] = False
+                self.status["logged_in"] = False
+                print("✅ Navegador cerrado")
+        except Exception as e:
+            print(f"⚠️ Error cerrando navegador: {e}")

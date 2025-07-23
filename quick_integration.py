@@ -923,7 +923,7 @@ SHOWCASE_HTML = """
         }
 
         // Procesar seleccionados
-        function processSelected() {
+        async function processSelected() {
             if (selectedProducts.size === 0) {
                 alert('Por favor selecciona al menos un producto');
                 return;
@@ -935,9 +935,30 @@ SHOWCASE_HTML = """
             
             console.log('Productos seleccionados para procesar:', selectedList);
             
-            // Aquí conectarías con el proceso de Selenium
+            // Confirmar acción
             if (confirm(`¿Procesar ${selectedList.length} productos?\\n\\nEsto generará las descripciones y las subirá a Stelorder.`)) {
-                startProcessing();
+                // Verificar estado de Selenium primero
+                try {
+                    const statusResponse = await fetch('/api/selenium/status');
+                    const status = await statusResponse.json();
+                    
+                    if (!status.browser_active) {
+                        if (confirm('Chrome no está iniciado. ¿Deseas iniciarlo ahora?')) {
+                            await startSelenium();
+                        }
+                        return;
+                    }
+                    
+                    if (!status.logged_in) {
+                        alert('Por favor, inicia sesión en Stelorder primero');
+                        return;
+                    }
+                    
+                    // Si todo está OK, iniciar procesamiento
+                    startProcessing();
+                } catch (error) {
+                    alert('Error verificando estado: ' + error.message);
+                }
             }
         }
 
