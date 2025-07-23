@@ -1,6 +1,7 @@
-# INSTRUCCIONES PARA CLINE:
-# Crear archivo test_selenium_navigation.py en la raíz del proyecto
-# Este script probará la navegación paso a paso
+"""
+Script de prueba para navegación en Stelorder
+Este script te ayudará a identificar los selectores correctos del DOM
+"""
 
 from navigation.selenium_handler import SeleniumHandler
 import time
@@ -19,7 +20,7 @@ def test_navigation():
         # 1. Iniciar navegador
         print("1. Iniciando navegador...")
         if not handler.start_browser(headless=False):  # Visible para debug
-            print("Error iniciando navegador")
+            print("❌ Error iniciando navegador")
             return
 
         # 2. Login
@@ -28,7 +29,7 @@ def test_navigation():
         password = os.getenv("STEL_PASSWORD") or input("Contraseña: ")
 
         if not handler.login_to_stelorder(username, password):
-            print("Error en login")
+            print("❌ Error en login")
             return
 
         print("✅ Login exitoso")
@@ -95,8 +96,35 @@ def test_navigation():
                 elements = handler.driver.find_elements("css selector", selector)
                 if elements:
                     print(f"✅ Encontrado elemento Shop con: {selector}")
+                    for el in elements:
+                        print(f"   - Texto: {el.text}, Visible: {el.is_displayed()}")
             except:
                 pass
+
+        # 7. Buscar botón editar
+        edit_selectors = [
+            "button[title*='Editar']",
+            "button:contains('Editar')",
+            ".btn-edit",
+            ".edit-button",
+            "a[href*='edit']",
+        ]
+
+        for selector in edit_selectors:
+            try:
+                elements = handler.driver.find_elements("css selector", selector)
+                if elements:
+                    print(f"✅ Encontrado botón editar con: {selector}")
+                    for el in elements:
+                        print(f"   - Texto: {el.text}, Visible: {el.is_displayed()}")
+            except:
+                pass
+
+        # 8. Guardar HTML para análisis
+        print("8. Guardando HTML para análisis...")
+        with open("stelorder_page.html", "w", encoding="utf-8") as f:
+            f.write(handler.driver.page_source)
+        print("✅ HTML guardado en stelorder_page.html")
 
         # Mantener abierto para inspección
         input("Presiona ENTER para cerrar el navegador...")

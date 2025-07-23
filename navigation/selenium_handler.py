@@ -153,24 +153,6 @@ class SeleniumHandler:
         except:
             return False
 
-    def navigate_to_product(self, sku):
-        """Navega a la página de edición de un producto"""
-        try:
-            # Ir a lista de productos
-            self.driver.get(f"{self.config['products_url']}/edit/{sku}")
-            time.sleep(2)
-
-            # Verificar que cargó la página correcta
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, "product-form"))
-            )
-
-            return True
-
-        except Exception as e:
-            print(f"❌ Error navegando al producto {sku}: {e}")
-            return False
-
     def navigate_to_catalog(self):
         """Navega al catálogo con la lógica específica de Stelorder"""
         try:
@@ -450,23 +432,6 @@ class SeleniumHandler:
 
         except Exception as e:
             print(f"⚠️ Error actualizando campos SEO: {e}")
-
-    def navigate_to_product(self, sku):
-        """MÉTODO ANTIGUO - Redirige al nuevo flujo"""
-        # Navegar al catálogo
-        if not self.navigate_to_catalog():
-            return False
-
-        # Buscar producto
-        if not self.search_product(sku):
-            return False
-
-        # Ir a pestaña Shop
-        if not self.navigate_to_shop_tab():
-            return False
-
-        # Hacer clic en Editar
-        return self.click_edit_shop()
 
     def _process_products_thread(self, products, generate_description_callback):
         """Thread de procesamiento usando la navegación específica de Stelorder"""

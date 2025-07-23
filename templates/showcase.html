@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEL Shop Manager - Generador de Descripciones</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #ff6600;
+            --primary-dark: #e55500;
+            --secondary: #333;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --success: #28a745;
+            --danger: #dc3545;
+            --transition: all 0.3s ease;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px var(--shadow);
+            transition: var(--transition);
+        }
+        .product-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 1.5rem;
+        }
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #ccc;
+        }
+        .product-body {
+            padding: 1rem;
+        }
+        .product-specs {
+            margin-bottom: 1rem;
+        }
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🏭 STEL Shop Manager - Generador de Descripciones</div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="products-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem;">Cargando productos...</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayProducts(data.products);
+                } else {
+                    showError('Error cargando productos: ' + (data.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                showError('Error de conexión: ' + error.message);
+            }
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('products-container');
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 3rem;">No se encontraron productos</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="products-grid">
+                    ${products.map(product => `
+                        <div class="product-card">
+                            <div class="product-header">
+                                <div class="product-name">${product.nombre || 'Producto'}</div>
+                                <div style="font-size: 0.9rem; opacity: 0.9;">${product.marca || ''} ${product.modelo || ''}</div>
+                            </div>
+                            
+                            <div class="product-image">
+                                ${product.imagen_url ? `<img src="${product.imagen_url}" alt="${product.nombre}" style="max-width: 100%; max-height: 100%; object-fit: contain;">` : '📷'}
+                            </div>
+                            
+                            <div class="product-body">
+                                <div class="product-specs">
+                                    ${product.sku ? `<div class="spec-item"><span>SKU:</span><span>${product.sku}</span></div>` : ''}
+                                    ${product.familia ? `<div class="spec-item"><span>Familia:</span><span>${product.familia}</span></div>` : ''}
+                                    ${product.potencia ? `<div class="spec-item"><span>Potencia:</span><span>${product.potencia}</span></div>` : ''}
+                                    <div class="spec-item">
+                                        <span>Stock:</span>
+                                        <span style="color: ${product.stock > 0 ? 'green' : 'red'}">${product.stock || 0} unidades</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); text-align: center; margin: 0.5rem 0;">
+                                    ${product.precio ? `USD ${parseFloat(product.precio).toLocaleString()}` : 'Consultar'}
+                                </div>
+                                
+                                <div>
+                                    <button class="btn" onclick="showDetail('${product.sku || ''}')">👁️ Ver Detalle</button>
+                                    ${product.pdf_url ? `<a href="${product.pdf_url}" target="_blank" class="btn" style="background: #6c757d;">📄 PDF</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showDetail(sku) {
+            alert('Funcionalidad de detalle para SKU: ' + sku);
+        }
+
+        function showError(message) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: red;">
+                    <p>❌ ${message}</p>
+                    <button class="btn" onclick="loadProducts()" style="margin-top: 1rem;">Reintentar</button>
+                </div>
+            `;
+        }
+
+        window.onload = loadProducts;
+    </script>
+</body>
+</html>
