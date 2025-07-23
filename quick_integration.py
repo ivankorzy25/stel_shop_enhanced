@@ -17,18 +17,23 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Importar el handler mejorado
 try:
     from ai_handler_enhanced import EnhancedAIHandler
+
     print("✅ Módulo AI cargado correctamente")
 except ImportError as e:
     print(f"⚠️  No se pudo cargar el módulo AI: {e}")
     print("   El sistema funcionará sin generación de IA")
     EnhancedAIHandler = None
 
+
 # Agregar esta función auxiliar para logging en selenium_handler
 def create_log_function(prefix=""):
     """Crea una función de log con prefijo opcional"""
+
     def log(message):
         print(f"{prefix}{message}")
+
     return log
+
 
 # Importar el handler de Selenium
 from navigation.selenium_handler import SeleniumHandler
@@ -48,7 +53,7 @@ AI_CONFIG = {
     "whatsapp": "541139563099",
     "email": "info@stelshop.com",
     "telefono_display": "+54 11 3956-3099",
-    "website": "www.stelshop.com"
+    "website": "www.stelshop.com",
 }
 
 # Handler de IA
@@ -1138,36 +1143,35 @@ SHOWCASE_HTML = """
 </html>
 """
 
+
 def get_products_from_cloud_function():
     """Obtiene productos desde la Cloud Function"""
     global products_cache, cache_timestamp
     import time
-    
+
     # Cache de 5 minutos
     if products_cache and (time.time() - cache_timestamp) < 300:
         return products_cache
-    
+
     try:
         print("🔄 Obteniendo productos desde Cloud Function...")
-        
+
         response = requests.get(
-            CLOUD_FUNCTION_URL,
-            timeout=30,
-            headers={'Accept': 'application/json'}
+            CLOUD_FUNCTION_URL, timeout=30, headers={"Accept": "application/json"}
         )
-        
+
         if response.status_code == 200:
             data = response.json()
-            
+
             # La Cloud Function puede devolver los datos en diferentes formatos
-            if isinstance(data, dict) and 'products' in data:
-                products = data['products']
+            if isinstance(data, dict) and "products" in data:
+                products = data["products"]
             elif isinstance(data, list):
                 products = data
             else:
                 # Intentar encontrar la lista de productos
-                products = data.get('data', [])
-            
+                products = data.get("data", [])
+
             print(f"✅ {len(products)} productos obtenidos")
             products_cache = products
             cache_timestamp = time.time()
@@ -1176,12 +1180,13 @@ def get_products_from_cloud_function():
             print(f"❌ Error: Status {response.status_code}")
             print(f"   Respuesta: {response.text[:200]}...")
             return []
-            
+
     except Exception as e:
         print(f"❌ Error conectando con Cloud Function: {e}")
         return []
 
-@app.route('/')
+
+@app.route("/")
 def index():
     """Página principal - redirige al showcase"""
     return """
@@ -1195,298 +1200,329 @@ def index():
     </html>
     """
 
-@app.route('/api/products')
+
+@app.route("/api/products")
 def get_products():
     """Obtiene todos los productos de la Cloud Function"""
     try:
         # Obtener productos desde Cloud Function
         products = get_products_from_cloud_function()
-        
+
         # Formatear productos al formato esperado
         formatted_products = []
         for product in products:
             # Adaptarse a diferentes nombres de campos posibles
-            formatted_products.append({
-                "sku": product.get('SKU') or product.get('sku') or '',
-                "nombre": product.get('Descripción') or product.get('descripcion') or product.get('nombre') or '',
-                "marca": product.get('Marca') or product.get('marca') or '',
-                "modelo": product.get('Modelo') or product.get('modelo') or '',
-                "familia": product.get('Familia') or product.get('familia') or '',
-                "precio": product.get('Precio_USD_con_IVA') or product.get('precio') or 0,
-                "stock": product.get('Stock') or product.get('stock') or 0,
-                "pdf_url": product.get('URL_PDF') or product.get('pdf_url') or '',
-                "potencia": product.get('Potencia') or product.get('potencia') or '',
-                "voltaje": product.get('Tensión') or product.get('voltaje') or '',
-                "motor": product.get('Motor') or product.get('motor') or '',
-                "combustible": product.get('Combustible') or product.get('combustible') or '',
-                "frecuencia": product.get('Frecuencia') or product.get('frecuencia') or '',
-                "consumo": product.get('Consumo_L_h') or product.get('consumo') or ''
-            })
-        
-        return jsonify({
-            "success": True,
-            "count": len(formatted_products),
-            "products": formatted_products
-        })
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+            formatted_products.append(
+                {
+                    "sku": product.get("SKU") or product.get("sku") or "",
+                    "nombre": product.get("Descripción")
+                    or product.get("descripcion")
+                    or product.get("nombre")
+                    or "",
+                    "marca": product.get("Marca") or product.get("marca") or "",
+                    "modelo": product.get("Modelo") or product.get("modelo") or "",
+                    "familia": product.get("Familia") or product.get("familia") or "",
+                    "precio": product.get("Precio_USD_con_IVA")
+                    or product.get("precio")
+                    or 0,
+                    "stock": product.get("Stock") or product.get("stock") or 0,
+                    "pdf_url": product.get("URL_PDF") or product.get("pdf_url") or "",
+                    "potencia": product.get("Potencia")
+                    or product.get("potencia")
+                    or "",
+                    "voltaje": product.get("Tensión") or product.get("voltaje") or "",
+                    "motor": product.get("Motor") or product.get("motor") or "",
+                    "combustible": product.get("Combustible")
+                    or product.get("combustible")
+                    or "",
+                    "frecuencia": product.get("Frecuencia")
+                    or product.get("frecuencia")
+                    or "",
+                    "consumo": product.get("Consumo_L_h")
+                    or product.get("consumo")
+                    or "",
+                }
+            )
 
-@app.route('/api/products/<sku>')
+        return jsonify(
+            {
+                "success": True,
+                "count": len(formatted_products),
+                "products": formatted_products,
+            }
+        )
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/products/<sku>")
 def get_product_detail(sku):
     """Obtiene detalle de un producto específico con descripción generada"""
     try:
         # Buscar producto en cache
         products = get_products_from_cloud_function()
-        
+
         # Buscar por SKU (considerando diferentes formatos)
         product = None
         for p in products:
-            if (p.get('SKU') == sku or p.get('sku') == sku):
+            if p.get("SKU") == sku or p.get("sku") == sku:
                 product = p
                 break
-        
+
         if not product:
             return jsonify({"error": "Producto no encontrado"}), 404
-        
+
         # Formatear producto
         formatted_product = {
-            "sku": product.get('SKU') or product.get('sku'),
-            "nombre": product.get('Descripción') or product.get('descripcion'),
-            "marca": product.get('Marca') or product.get('marca'),
-            "modelo": product.get('Modelo') or product.get('modelo'),
-            "familia": product.get('Familia') or product.get('familia'),
-            "precio": product.get('Precio_USD_con_IVA') or product.get('precio'),
-            "stock": product.get('Stock') or product.get('stock'),
-            "pdf_url": product.get('URL_PDF') or product.get('pdf_url'),
-            "raw_data": product
+            "sku": product.get("SKU") or product.get("sku"),
+            "nombre": product.get("Descripción") or product.get("descripcion"),
+            "marca": product.get("Marca") or product.get("marca"),
+            "modelo": product.get("Modelo") or product.get("modelo"),
+            "familia": product.get("Familia") or product.get("familia"),
+            "precio": product.get("Precio_USD_con_IVA") or product.get("precio"),
+            "stock": product.get("Stock") or product.get("stock"),
+            "pdf_url": product.get("URL_PDF") or product.get("pdf_url"),
+            "raw_data": product,
         }
-        
+
         # Generar descripción mejorada si tenemos IA
         if ai_handler:
             try:
-                formatted_product['descripcion_html'] = ai_handler.generate_enhanced_description(
-                    product, AI_CONFIG
+                formatted_product["descripcion_html"] = (
+                    ai_handler.generate_enhanced_description(product, AI_CONFIG)
                 )
-                formatted_product['seo'] = ai_handler.generate_seo_metadata(product)
+                formatted_product["seo"] = ai_handler.generate_seo_metadata(product)
             except Exception as e:
                 print(f"Error generando descripción: {e}")
-                formatted_product['descripcion_html'] = None
-        
-        return jsonify({
-            "success": True,
-            "product": formatted_product
-        })
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+                formatted_product["descripcion_html"] = None
 
-@app.route('/showcase')
+        return jsonify({"success": True, "product": formatted_product})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/showcase")
 def showcase():
     """Página de visualización de productos"""
     return SHOWCASE_HTML
 
-@app.route('/api/generate-description', methods=['POST'])
+
+@app.route("/api/generate-description", methods=["POST"])
 def generate_description():
     """Genera descripción HTML para un producto"""
     try:
         data = request.json
-        
-        if not data or 'sku' not in data:
+
+        if not data or "sku" not in data:
             return jsonify({"error": "SKU requerido"}), 400
-        
+
         # Buscar producto
         products = get_products_from_cloud_function()
         product = None
-        
+
         for p in products:
-            if (p.get('SKU') == data['sku'] or p.get('sku') == data['sku']):
+            if p.get("SKU") == data["sku"] or p.get("sku") == data["sku"]:
                 product = p
                 break
-        
+
         if not product:
             return jsonify({"error": "Producto no encontrado"}), 404
-        
+
         # Generar descripción
         if not ai_handler:
             return jsonify({"error": "IA no configurada"}), 500
-        
-        description_html = ai_handler.generate_enhanced_description(
-            product, AI_CONFIG
-        )
-        
-        seo_metadata = ai_handler.generate_seo_metadata(product)
-        
-        return jsonify({
-            "success": True,
-            "sku": data['sku'],
-            "description_html": description_html,
-            "seo": seo_metadata
-        })
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
 
-@app.route('/api/selenium/start', methods=['POST'])
+        description_html = ai_handler.generate_enhanced_description(product, AI_CONFIG)
+
+        seo_metadata = ai_handler.generate_seo_metadata(product)
+
+        return jsonify(
+            {
+                "success": True,
+                "sku": data["sku"],
+                "description_html": description_html,
+                "seo": seo_metadata,
+            }
+        )
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/selenium/start", methods=["POST"])
 def start_selenium():
     """Inicia el navegador Chrome"""
     try:
         data = request.json or {}
-        headless = data.get('headless', False)
-        
-        success = selenium_handler.start_browser(headless)
-        
-        return jsonify({
-            "success": success,
-            "status": selenium_handler.get_status()
-        })
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        headless = data.get("headless", False)
 
-@app.route('/api/selenium/login', methods=['POST'])
+        success = selenium_handler.start_browser(headless)
+
+        return jsonify({"success": success, "status": selenium_handler.get_status()})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/selenium/login", methods=["POST"])
 def selenium_login():
     """Realiza login en Stelorder"""
     try:
         data = request.json or {}
-        username = data.get('username')
-        password = data.get('password')
-        
-        success = selenium_handler.login_to_stelorder(username, password)
-        
-        return jsonify({
-            "success": success,
-            "status": selenium_handler.get_status()
-        })
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        username = data.get("username")
+        password = data.get("password")
 
-@app.route('/api/selenium/status')
+        success = selenium_handler.login_to_stelorder(username, password)
+
+        return jsonify({"success": success, "status": selenium_handler.get_status()})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/selenium/status")
 def selenium_status():
     """Obtiene el estado de Selenium"""
     return jsonify(selenium_handler.get_status())
 
-@app.route('/api/process-products', methods=['POST'])
+
+@app.route("/api/process-products", methods=["POST"])
 def process_products_selenium():
     """Procesa productos con Selenium"""
     try:
         data = request.json
-        products = data.get('products', [])
-        
+        products = data.get("products", [])
+
         if not products:
             return jsonify({"error": "No hay productos para procesar"}), 400
-        
+
         if not selenium_handler.is_logged_in:
             return jsonify({"error": "Debes iniciar sesión en Stelorder primero"}), 400
-        
+
         # Función callback para generar descripciones
         def generate_description_for_product(product):
+            """Genera TODAS las descripciones usando IA obligatoriamente"""
             try:
-                # Crear función de log para el handler
-                log_func = create_log_function("      ")
-                
-                if ai_handler:
-                    # Generar con IA
-                    description_html = ai_handler.generate_enhanced_description(
-                        product, AI_CONFIG
+                if not ai_handler:
+                    raise Exception(
+                        "ERROR: IA no configurada. La IA es OBLIGATORIA para generar descripciones."
                     )
-                    seo = ai_handler.generate_seo_metadata(product)
-                    
-                    # Generar descripción simple (primera parte del nombre + características)
-                    descripcion_simple = f"{product.get('nombre', 'Producto')}\n"
-                    if product.get('potencia'):
-                        descripcion_simple += f"Potencia: {product['potencia']}\n"
-                    if product.get('motor'):
-                        descripcion_simple += f"Motor: {product['motor']}\n"
-                    
-                    return {
-                        "descripcion": descripcion_simple,
-                        "descripcion_detallada": description_html,
-                        "seo": seo
-                    }
-                else:
-                    # Sin IA, usar descripción básica
-                    return {
-                        "descripcion": product.get('nombre', 'Producto'),
-                        "descripcion_detallada": f"<p>{product.get('nombre', 'Producto')}</p>",
-                        "seo": {
-                            "title": product.get('nombre', 'Producto'),
-                            "description": product.get('nombre', 'Producto')[:160]
-                        }
-                    }
+
+                # Preparar la información del producto con todos los campos posibles
+                product_info = {
+                    "sku": product.get("sku") or product.get("SKU"),
+                    "nombre": product.get("nombre")
+                    or product.get("Descripción")
+                    or product.get("descripcion"),
+                    "marca": product.get("marca") or product.get("Marca"),
+                    "modelo": product.get("modelo") or product.get("Modelo"),
+                    "familia": product.get("familia") or product.get("Familia"),
+                    "potencia_kva": product.get("potencia_kva")
+                    or product.get("Potencia_KVA_Emergencia"),
+                    "potencia_kw": product.get("potencia_kw")
+                    or product.get("Potencia_KW_Emergencia"),
+                    "voltaje": product.get("voltaje") or product.get("Voltaje"),
+                    "frecuencia": product.get("frecuencia")
+                    or product.get("Frecuencia"),
+                    "motor": product.get("motor") or product.get("Motor_Marca_Modelo"),
+                    "consumo": product.get("consumo")
+                    or product.get("Consumo_Combustible_L_H"),
+                    "tanque": product.get("tanque")
+                    or product.get("Capacidad_Tanque_L"),
+                    "largo": product.get("largo")
+                    or product.get("Dimensiones_Largo_mm"),
+                    "ancho": product.get("ancho")
+                    or product.get("Dimensiones_Ancho_mm"),
+                    "alto": product.get("alto") or product.get("Dimensiones_Alto_mm"),
+                    "peso": product.get("peso") or product.get("Peso_kg"),
+                    "pdf_url": product.get("pdf_url")
+                    or product.get("URL_PDF")
+                    or product.get("URL PDF"),
+                }
+
+                # Llamar al nuevo método que genera todo con IA
+                resultado = (
+                    ai_handler.generar_descripcion_detallada_html_premium_con_ia(
+                        product_info, AI_CONFIG
+                    )
+                )
+
+                print(f"✅ Descripciones generadas con IA para {product_info['sku']}")
+
+                # Retornar en el formato esperado por Selenium
+                return {
+                    "descripcion": resultado["descripcion"],
+                    "descripcion_detallada": resultado["descripcion_html"],
+                    "seo": {
+                        "title": resultado["seo_titulo"],
+                        "description": resultado["seo_descripcion"],
+                    },
+                }
+
             except Exception as e:
-                print(f"Error generando descripción: {e}")
-                return None
-        
+                print(f"❌ Error crítico generando descripción: {e}")
+                # No hay fallback - la IA es obligatoria
+                raise e
+
         # Iniciar procesamiento
         selenium_handler.process_products(products, generate_description_for_product)
-        
-        return jsonify({
-            "success": True,
-            "message": f"Procesando {len(products)} productos",
-            "status": selenium_handler.get_status()
-        })
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
 
-@app.route('/api/selenium/pause', methods=['POST'])
+        return jsonify(
+            {
+                "success": True,
+                "message": f"Procesando {len(products)} productos",
+                "status": selenium_handler.get_status(),
+            }
+        )
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/selenium/pause", methods=["POST"])
 def pause_selenium():
     """Pausa el procesamiento"""
     selenium_handler.pause()
     return jsonify({"success": True, "status": selenium_handler.get_status()})
 
-@app.route('/api/selenium/resume', methods=['POST'])
+
+@app.route("/api/selenium/resume", methods=["POST"])
 def resume_selenium():
     """Reanuda el procesamiento"""
     selenium_handler.resume()
     return jsonify({"success": True, "status": selenium_handler.get_status()})
 
-@app.route('/api/selenium/stop', methods=['POST'])
+
+@app.route("/api/selenium/stop", methods=["POST"])
 def stop_selenium():
     """Detiene el procesamiento"""
     selenium_handler.stop()
     return jsonify({"success": True, "status": selenium_handler.get_status()})
 
-@app.route('/api/selenium/close', methods=['POST'])
+
+@app.route("/api/selenium/close", methods=["POST"])
 def close_selenium():
     """Cierra el navegador"""
     selenium_handler.close_browser()
     return jsonify({"success": True, "status": selenium_handler.get_status()})
 
+
 def initialize_app():
     """Inicializa la aplicación con la configuración"""
     global ai_handler
-    
+
     print("🚀 Inicializando STEL Shop Manager Mejorado...")
-    
+
     # Inicializar IA
     try:
-        ai_handler = EnhancedAIHandler(AI_CONFIG['api_key'])
+        ai_handler = EnhancedAIHandler(AI_CONFIG["api_key"])
         print("✅ IA inicializada correctamente")
     except Exception as e:
         print(f"⚠️ Error inicializando IA: {e}")
         print("   El sistema funcionará sin generación de IA")
-    
+
     # Verificar conexión a Cloud Function
     print("🔍 Verificando conexión a Cloud Function...")
     products = get_products_from_cloud_function()
@@ -1495,13 +1531,14 @@ def initialize_app():
     else:
         print("⚠️ No se pudieron obtener productos de Cloud Function")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Inicializar aplicación
     initialize_app()
-    
+
     # Iniciar servidor
     print("\n🌐 Servidor iniciando en http://localhost:5000")
     print("📄 Documentación de API en http://localhost:5000")
     print("🎨 Showcase de productos en http://localhost:5000/showcase")
-    
-    app.run(debug=False, port=5000, host='0.0.0.0')
+
+    app.run(debug=False, port=5000, host="0.0.0.0")

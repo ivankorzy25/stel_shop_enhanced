@@ -1,2 +1,3 @@
-2025/07/20-16:57:38.768 1c9beac Creating DB /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/shared_proto_db/metadata since it was missing.
-2025/07/20-16:57:38.784 1c9beac Reusing MANIFEST /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/shared_proto_db/metadata/MANIFEST-000001
+2025/07/22-21:54:38.266 1e69c2e Reusing MANIFEST /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/shared_proto_db/metadata/MANIFEST-000001
+2025/07/22-21:54:38.267 1e69c2e Recovering log #3
+2025/07/22-21:54:38.267 1e69c2e Reusing old log /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/shared_proto_db/metadata/000003.log 

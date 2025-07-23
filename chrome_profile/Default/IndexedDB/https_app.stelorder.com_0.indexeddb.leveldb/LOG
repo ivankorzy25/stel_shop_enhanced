@@ -1,3 +1,7 @@
-2025/07/20-16:58:54.183 1c9be9d Creating DB /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/IndexedDB/https_app.stelorder.com_0.indexeddb.leveldb since it was missing.
-2025/07/20-16:58:54.186 1c9be9d Reusing MANIFEST /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/IndexedDB/https_app.stelorder.com_0.indexeddb.leveldb/MANIFEST-000001
-2025/07/20-16:58:54.191 1c9beaa Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/07/22-21:54:57.303 1e69c31 Reusing MANIFEST /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/IndexedDB/https_app.stelorder.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/07/22-21:54:57.303 1e69c31 Recovering log #3
+2025/07/22-21:54:57.303 1e69c31 Reusing old log /Users/ivan/Desktop/stel_shop_enhanced/chrome_profile/Default/IndexedDB/https_app.stelorder.com_0.indexeddb.leveldb/000003.log 
+2025/07/22-21:54:57.316 1e69c3e Level-0 table #5: started
+2025/07/22-21:54:57.321 1e69c3e Level-0 table #5: 2620 bytes OK
+2025/07/22-21:54:57.323 1e69c3e Delete type=0 #3
+2025/07/22-21:54:57.323 1e69c2e Manual compaction at level-0 from '\x00\x03\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x04\x00\x00\x00' @ 0 : 0; will stop at (end)
