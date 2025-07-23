@@ -153,108 +153,6 @@ class SeleniumHandler:
         except:
             return False
 
-    def navigate_to_catalog(self):
-        """Navega al catálogo con la lógica específica de Stelorder"""
-        try:
-            self.log("🔄 NAVEGACIÓN FORZADA al catálogo...")
-
-            # 1. Limpiar completamente la sesión
-            self.driver.get("about:blank")
-            time.sleep(1)
-
-            # 2. Navegar directamente al catálogo
-            self.driver.get("https://app.stelorder.com/app/#main_catalogo")
-            time.sleep(5)
-
-            # 3. Forzar refresco
-            self.driver.refresh()
-            time.sleep(3)
-
-            # 4. Hacer clic en la pestaña Catálogo
-            catalogo_btn = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "//a[@id='ui-id-2']"))
-            )
-            self.driver.execute_script("arguments[0].click();", catalogo_btn)
-            time.sleep(3)
-
-            # 5. Verificar que el buscador está disponible
-            buscador = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, "//input[contains(@class, 'buscadorListado')]")
-                )
-            )
-
-            # Limpiar buscador
-            self.driver.execute_script("arguments[0].value = '';", buscador)
-            buscador.clear()
-
-            return True
-
-        except Exception as e:
-            print(f"❌ Error navegando al catálogo: {e}")
-            return False
-
-    def search_product(self, codigo_producto):
-        """Busca un producto específico en el catálogo"""
-        try:
-            # Encontrar buscador
-            buscador = self.driver.find_element(
-                By.XPATH, "//input[contains(@class, 'buscadorListado')]"
-            )
-
-            # Limpiar con doble método
-            buscador.clear()
-            self.driver.execute_script("arguments[0].value = '';", buscador)
-            time.sleep(0.5)
-
-            # Escribir letra por letra
-            for letra in str(codigo_producto):
-                buscador.send_keys(letra)
-                time.sleep(0.05)
-
-            time.sleep(2)  # Esperar resultados
-
-            # Hacer clic en el primer resultado
-            primer_fila = self.driver.find_element(
-                By.XPATH, "//td[@class='tdTextoLargo tdBold']"
-            )
-            self.driver.execute_script("arguments[0].click();", primer_fila)
-            time.sleep(3)
-
-            return True
-
-        except Exception as e:
-            print(f"❌ Error buscando producto {codigo_producto}: {e}")
-            return False
-
-    def navigate_to_shop_tab(self):
-        """Navega a la pestaña Shop del producto"""
-        try:
-            shop_tab = self.driver.find_element(By.XPATH, "//a[@id='ui-id-31']")
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", shop_tab)
-            time.sleep(1)
-            self.driver.execute_script("arguments[0].click();", shop_tab)
-            time.sleep(3)
-            return True
-
-        except Exception as e:
-            print(f"❌ Error navegando a pestaña Shop: {e}")
-            return False
-
-    def click_edit_shop(self):
-        """Hace clic en el botón Editar Shop"""
-        try:
-            editar_btn = self.driver.find_element(By.XPATH, "//*[@id='editarShop']")
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", editar_btn)
-            time.sleep(1)
-            self.driver.execute_script("arguments[0].click();", editar_btn)
-            time.sleep(3)
-            return True
-
-        except Exception as e:
-            print(f"❌ Error haciendo clic en Editar Shop: {e}")
-            return False
-
     def update_product_description(self, product_data, description_html):
         """Actualiza la descripción de un producto en el modal de Stelorder"""
         try:
@@ -454,36 +352,122 @@ class SeleniumHandler:
                     f"\n📦 Procesando {index + 1}/{self.total_products}: {product.get('nombre')}"
                 )
 
-                # PASO 1: Navegar al catálogo (siempre para cada producto)
-                print("   🔄 Navegando al catálogo...")
-                if not self.navigate_to_catalog():
+                # PASO 1: NAVEGACIÓN FORZADA AL CATÁLOGO (SIEMPRE)
+                print("   🔄 NAVEGACIÓN FORZADA al catálogo...")
+                try:
+                    # 1.1 Limpiar completamente la sesión
+                    self.driver.get("about:blank")
+                    time.sleep(1)
+
+                    # 1.2 Navegar directamente al catálogo
+                    self.driver.get("https://app.stelorder.com/app/#main_catalogo")
+                    time.sleep(5)
+
+                    # 1.3 Forzar refresco
+                    self.driver.refresh()
+                    time.sleep(3)
+
+                    # 1.4 Hacer clic en la pestaña Catálogo
+                    try:
+                        catalogo_btn = WebDriverWait(self.driver, 10).until(
+                            EC.presence_of_element_located(
+                                (By.XPATH, "//a[@id='ui-id-2']")
+                            )
+                        )
+                        self.driver.execute_script(
+                            "arguments[0].click();", catalogo_btn
+                        )
+                        print("   ✅ Pestaña Catálogo activada")
+                        time.sleep(3)
+                    except Exception as e:
+                        print(f"   ⚠️ No se pudo hacer clic en pestaña Catálogo: {e}")
+
+                    # 1.5 Verificar y limpiar buscador
+                    buscador = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, "//input[contains(@class, 'buscadorListado')]")
+                        )
+                    )
+                    self.driver.execute_script("arguments[0].value = '';", buscador)
+                    buscador.clear()
+                    print("   ✅ Buscador limpiado y listo")
+
+                except Exception as e:
+                    print(f"   ❌ Error navegando al catálogo: {e}")
                     self.error_count += 1
                     self.status["errors"] = self.error_count
                     continue
 
-                # PASO 2: Buscar el producto
+                # PASO 2: BUSCAR PRODUCTO
                 sku = product.get("sku") or product.get("SKU") or product.get("codigo")
                 print(f"   🔍 Buscando producto: {sku}")
-                if not self.search_product(sku):
+                try:
+                    buscador = self.driver.find_element(
+                        By.XPATH, "//input[contains(@class, 'buscadorListado')]"
+                    )
+                    buscador.clear()
+                    self.driver.execute_script("arguments[0].value = '';", buscador)
+                    time.sleep(0.5)
+
+                    # Escribir letra por letra
+                    for letra in str(sku):
+                        buscador.send_keys(letra)
+                        time.sleep(0.05)
+                    time.sleep(2)
+
+                    # Hacer clic en el primer resultado
+                    primer_fila = WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable(
+                            (By.XPATH, "//td[@class='tdTextoLargo tdBold']")
+                        )
+                    )
+                    self.driver.execute_script("arguments[0].click();", primer_fila)
+                    time.sleep(3)
+                    print("   ✅ Producto encontrado y seleccionado")
+
+                except Exception as e:
+                    print(f"   ❌ Error buscando producto: {e}")
                     self.error_count += 1
                     self.status["errors"] = self.error_count
                     continue
 
-                # PASO 3: Ir a pestaña Shop
+                # PASO 3: IR A PESTAÑA SHOP
                 print("   📑 Abriendo pestaña Shop...")
-                if not self.navigate_to_shop_tab():
+                try:
+                    shop_tab = self.driver.find_element(By.XPATH, "//a[@id='ui-id-31']")
+                    self.driver.execute_script(
+                        "arguments[0].scrollIntoView(true);", shop_tab
+                    )
+                    time.sleep(1)
+                    self.driver.execute_script("arguments[0].click();", shop_tab)
+                    time.sleep(3)
+                    print("   ✅ Pestaña Shop activada")
+                except Exception as e:
+                    print(f"   ❌ Error navegando a pestaña Shop: {e}")
                     self.error_count += 1
                     self.status["errors"] = self.error_count
                     continue
 
-                # PASO 4: Hacer clic en Editar Shop
+                # PASO 4: HACER CLIC EN EDITAR SHOP
                 print("   ✏️ Abriendo editor...")
-                if not self.click_edit_shop():
+                try:
+                    editar_btn = self.driver.find_element(
+                        By.XPATH, "//*[@id='editarShop']"
+                    )
+                    self.driver.execute_script(
+                        "arguments[0].scrollIntoView(true);", editar_btn
+                    )
+                    time.sleep(1)
+                    self.driver.execute_script("arguments[0].click();", editar_btn)
+                    time.sleep(3)
+                    print("   ✅ Editor abierto")
+                except Exception as e:
+                    print(f"   ❌ Error abriendo editor: {e}")
                     self.error_count += 1
                     self.status["errors"] = self.error_count
                     continue
 
-                # PASO 5: Generar descripción con IA
+                # PASO 5: GENERAR DESCRIPCIÓN CON IA
                 print("   🤖 Generando descripción con IA...")
                 description_data = generate_description_callback(product)
 
@@ -493,7 +477,7 @@ class SeleniumHandler:
                     self.status["errors"] = self.error_count
                     continue
 
-                # PASO 6: Actualizar los campos
+                # PASO 6: ACTUALIZAR CAMPOS
                 print("   💾 Actualizando campos...")
                 product_update = {
                     **product,
