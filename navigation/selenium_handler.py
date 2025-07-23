@@ -84,11 +84,12 @@ class SeleniumHandler:
             return False
 
     def login_to_stelorder(self, username=None, password=None):
-        """Realiza login en Stelorder"""
+        """Navega a Stelorder y espera confirmación manual del login"""
         try:
             print("🔐 Navegando a Stelorder...")
-            self.driver.get(self.config["login_url"])
-            time.sleep(2)
+            # Navegar a la página principal de la aplicación
+            self.driver.get("https://www.stelorder.com/app/")
+            time.sleep(3)
 
             # Verificar si ya está logueado
             if self.check_login_status():
@@ -97,49 +98,58 @@ class SeleniumHandler:
                 self.status["logged_in"] = True
                 return True
 
-            if not username or not password:
-                print("⚠️ Credenciales no proporcionadas")
-                print("   Por favor, realiza el login manualmente")
-                return False
-
-            # Buscar campos de login
-            username_field = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.NAME, "username"))
-            )
-            password_field = self.driver.find_element(By.NAME, "password")
-            login_button = self.driver.find_element(
-                By.XPATH, "//button[@type='submit']"
+            print("⏳ ESPERANDO LOGIN MANUAL...")
+            print("📌 Por favor:")
+            print("   1. Inicia sesión manualmente en Stelorder")
+            print(
+                "   2. Cuando estés dentro, presiona el botón 'Confirmar Login' en la aplicación"
             )
 
-            # Completar y enviar
-            username_field.clear()
-            username_field.send_keys(username)
-            password_field.clear()
-            password_field.send_keys(password)
+            # NO intentar login automático, solo esperar confirmación
+            return False  # Retornar False para indicar que necesita confirmación manual
 
-            login_button.click()
-            time.sleep(3)
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            return False
 
-            # Verificar login exitoso
+    def confirm_login(self):
+        """Confirma que el usuario ya hizo login manualmente"""
+        try:
+            # Verificar que realmente esté logueado
             if self.check_login_status():
-                print("✅ Login exitoso")
+                print("✅ Login confirmado exitosamente")
                 self.is_logged_in = True
                 self.status["logged_in"] = True
                 return True
             else:
-                print("❌ Login fallido")
+                print(
+                    "❌ No se detectó sesión activa. Por favor, realiza el login primero."
+                )
                 return False
-
         except Exception as e:
-            print(f"❌ Error en login: {e}")
+            print(f"❌ Error verificando login: {e}")
             return False
 
     def check_login_status(self):
-        """Verifica si está logueado"""
+        """Verifica si está logueado buscando elementos específicos de Stelorder"""
         try:
-            # Buscar elemento que solo aparece cuando está logueado
-            self.driver.find_element(By.CLASS_NAME, "user-menu")
-            return True
+            # Intentar encontrar elementos que solo aparecen cuando está logueado
+            # Ajustar según la estructura real de Stelorder
+            selectors_to_check = [
+                "a[href*='catalogo']",  # Link al catálogo
+                "#main_catalogo",  # Div del catálogo
+                ".user-menu",  # Menú de usuario
+                "#ui-id-2",  # Tab del catálogo
+            ]
+
+            for selector in selectors_to_check:
+                try:
+                    self.driver.find_element(By.CSS_SELECTOR, selector)
+                    return True
+                except:
+                    continue
+
+            return False
         except:
             return False
 

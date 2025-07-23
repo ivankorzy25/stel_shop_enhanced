@@ -1,22 +1,17 @@
-[2447:31890443:0722/205331.567281:INFO:components/enterprise/browser/controller/chrome_browser_cloud_management_controller.cc:202] No machine level policy manager exists.
-[2447:31890482:0722/205335.305080:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/205402.152131:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/205457.064754:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/205620.561013:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/210005.755638:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/210720.682265:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/215438.567307:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890443:0722/215450.578000:INFO:CONSOLE:895] "ConsentModeV2 [object Object]", source: https://www.googletagmanager.com/gtm.js?id=GTM-MN22WFP (895)
-[2447:31890443:0722/215459.501235:INFO:CONSOLE:0] "[DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o", source: https://app.stelorder.com/app/ (0)
-[2447:31890482:0722/215504.048270:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890443:0722/215513.153774:INFO:CONSOLE:285] "Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading", source: https://maps.google.com/maps/api/js?key=AIzaSyCc3aSe8mnu2HU_da1hx4Fl3f2_aL1dVdc&sensor=false&libraries={MarkerClusterer,geometry} (285)
-[2447:31890443:0722/215513.601529:INFO:CONSOLE:5] "The specified value "!" does not conform to the required format.  The format is "#rrggbb" where rr, gg, bb are two-digit hexadecimal numbers.", source: https://app.stelorder.com/app/stelorder/lib/jquery-1.10.2.min.js (5)
-[2447:31890443:0722/215517.579432:INFO:CONSOLE:257] "[object Object] error ", source: https://app.stelorder.com/app/stelorder/lib/jquery.i18n.properties-1.0.9.js?nocache=4de3d9b97bea5652b42bb5e058dfbb3f1439136a} (257)
-[2447:31890443:0722/215517.898104:INFO:CONSOLE:257] "[object Object] error ", source: https://app.stelorder.com/app/stelorder/lib/jquery.i18n.properties-1.0.9.js?nocache=4de3d9b97bea5652b42bb5e058dfbb3f1439136a} (257)
-[2447:31890443:0722/215518.158256:INFO:CONSOLE:31] "Google Maps JavaScript API warning: SensorNotRequired https://developers.google.com/maps/documentation/javascript/error-messages#sensor-not-required", source: https://maps.google.com/maps-api-v3/api/js/61/11a/intl/es_419/util.js (31)
-[2447:31890443:0722/215518.996498:INFO:CONSOLE:0] "Potential permissions policy violation: payment is not allowed in this document.", source:  (0)
-[2447:31890482:0722/215554.025592:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/215723.683888:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[2447:31890482:0722/215751.707241:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2
-[2447:31890443:0722/215751.729644:ERROR:content/browser/network_service_instance_impl.cc:597] Network service crashed, restarting service.
-[42646:32019247:0722/215751.838071:WARNING:components/prefs/pref_notifier_impl.cc:60] Init observer found at shutdown.
+[11959:32222516:0722/234405.633867:INFO:components/enterprise/browser/controller/chrome_browser_cloud_management_controller.cc:202] No machine level policy manager exists.
+[11959:32222568:0722/234409.642164:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[11959:32222516:0722/234414.673339:INFO:CONSOLE:895] "ConsentModeV2 [object Object]", source: https://www.googletagmanager.com/gtm.js?id=GTM-MN22WFP (895)
+[11959:32222516:0722/234418.557287:INFO:CONSOLE:0] "[DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o", source: https://app.stelorder.com/app/ (0)
+[11959:32222516:0722/234433.934693:INFO:CONSOLE:285] "Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading", source: https://maps.google.com/maps/api/js?key=AIzaSyCc3aSe8mnu2HU_da1hx4Fl3f2_aL1dVdc&sensor=false&libraries={MarkerClusterer,geometry} (285)
+[11959:32222516:0722/234434.529400:INFO:CONSOLE:5] "The specified value "!" does not conform to the required format.  The format is "#rrggbb" where rr, gg, bb are two-digit hexadecimal numbers.", source: https://app.stelorder.com/app/stelorder/lib/jquery-1.10.2.min.js (5)
+[11959:32222568:0722/234437.648021:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[11959:32222516:0722/234438.318532:INFO:CONSOLE:257] "[object Object] error ", source: https://app.stelorder.com/app/stelorder/lib/jquery.i18n.properties-1.0.9.js?nocache=4de3d9b97bea5652b42bb5e058dfbb3f1439136a} (257)
+[11959:32222516:0722/234438.636033:INFO:CONSOLE:257] "[object Object] error ", source: https://app.stelorder.com/app/stelorder/lib/jquery.i18n.properties-1.0.9.js?nocache=4de3d9b97bea5652b42bb5e058dfbb3f1439136a} (257)
+[11959:32222516:0722/234438.939070:INFO:CONSOLE:31] "Google Maps JavaScript API warning: SensorNotRequired https://developers.google.com/maps/documentation/javascript/error-messages#sensor-not-required", source: https://maps.google.com/maps-api-v3/api/js/61/11a/intl/es_419/util.js (31)
+[11959:32222516:0722/234439.361007:INFO:CONSOLE:0] "Potential permissions policy violation: payment is not allowed in this document.", source:  (0)
+[11959:32222568:0722/234528.346461:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[11959:32222565:0722/234535.738472:INFO:rlz/lib/rlz_lib.cc:442] Attempting to send RLZ ping brand=CHFA
+[11959:32222565:0722/234536.965434:INFO:rlz/lib/rlz_lib.cc:451] Succeeded in sending RLZ ping
+[11959:32222568:0722/234705.839769:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[11959:32222568:0722/235054.713249:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[11959:32222568:0722/235320.394699:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2

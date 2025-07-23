@@ -605,11 +605,38 @@ SHOWCASE_HTML = """
         </div>
     </div>
 
+    <!-- Modal de Login -->
+    <div id="login-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>🔐 Configuración de Selenium</h2>
+                <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 2rem; text-align: center;">
+                <div id="login-status">
+                    <h3>Chrome está abierto</h3>
+                    <p style="margin: 1rem 0; color: #666;">
+                        Por favor, inicia sesión manualmente en Stelorder.
+                    </p>
+                    <p style="margin: 1rem 0;">
+                        Una vez que hayas iniciado sesión correctamente, 
+                        presiona el botón de abajo para confirmar.
+                    </p>
+                    <button class="btn btn-success btn-large" onclick="confirmLogin()">
+                        ✅ Confirmar que ya estoy logueado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Estado de la aplicación
         let allProducts = [];
         let filteredProducts = [];
         let selectedProducts = new Set();
+        // Variable para trackear si estamos esperando login
+        let waitingForLogin = false;
         
         // Cargar productos
         async function loadProducts() {
@@ -944,13 +971,16 @@ SHOWCASE_HTML = """
                     
                     if (!status.browser_active) {
                         if (confirm('Chrome no está iniciado. ¿Deseas iniciarlo ahora?')) {
+                            waitingForLogin = true;
                             await startSelenium();
                         }
                         return;
                     }
                     
                     if (!status.logged_in) {
-                        alert('Por favor, inicia sesión en Stelorder primero');
+                        // Mostrar modal de login
+                        document.getElementById('login-modal').style.display = 'block';
+                        waitingForLogin = true;
                         return;
                     }
                     
@@ -964,6 +994,76 @@ SHOWCASE_HTML = """
 
         // Panel de control de Selenium
         let seleniumInterval = null;
+
+        async function startSelenium() {
+            try {
+                const response = await fetch('/api/selenium/start', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({headless: false})
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Mostrar modal de login
+                    document.getElementById('login-modal').style.display = 'block';
+                    waitingForLogin = true;
+                } else {
+                    alert('Error iniciando Chrome: ' + (result.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function confirmLogin() {
+            try {
+                // Mostrar loading
+                document.getElementById('login-status').innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Verificando login...</p>
+                    </div>
+                `;
+                
+                const response = await fetch('/api/selenium/confirm-login', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Login confirmado exitosamente
+                    closeLoginModal();
+                    alert('✅ Login confirmado exitosamente. Ya puedes procesar productos.');
+                    
+                    // Si había productos pendientes, procesarlos
+                    if (waitingForLogin && selectedProducts.size > 0) {
+                        waitingForLogin = false;
+                        startProcessing();
+                    }
+                } else {
+                    // Restaurar el modal
+                    document.getElementById('login-status').innerHTML = `
+                        <h3>❌ No se detectó sesión activa</h3>
+                        <p style="margin: 1rem 0; color: red;">
+                            Por favor, asegúrate de haber iniciado sesión en Stelorder.
+                        </p>
+                        <button class="btn btn-success btn-large" onclick="confirmLogin()">
+                            🔄 Reintentar
+                        </button>
+                    `;
+                }
+            } catch (error) {
+                alert('Error verificando login: ' + error.message);
+                closeLoginModal();
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
 
         async function startProcessing() {
             const selectedList = Array.from(selectedProducts).map(id => 
@@ -1398,6 +1498,29 @@ def selenium_login():
         success = selenium_handler.login_to_stelorder(username, password)
 
         return jsonify({"success": success, "status": selenium_handler.get_status()})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/selenium/confirm-login", methods=["POST"])
+def confirm_selenium_login():
+    """Confirma que el usuario ya realizó login manualmente"""
+    try:
+        if not selenium_handler.driver:
+            return jsonify({"success": False, "error": "Chrome no está iniciado"}), 400
+
+        success = selenium_handler.confirm_login()
+
+        return jsonify(
+            {
+                "success": success,
+                "status": selenium_handler.get_status(),
+                "message": (
+                    "Login confirmado" if success else "No se detectó sesión activa"
+                ),
+            }
+        )
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
